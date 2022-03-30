@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import styled from 'styled-components';
-import { BasicObjectList } from './threejs/TBaseObject';
+import { BasicObjectList } from './threejs/TBasicObject';
 import { TEngine } from './threejs/TEngine';
+import { LightsList } from './threejs/TLights';
 
 export default function App() {
 
@@ -13,11 +14,9 @@ export default function App() {
         }
 
         const engine = new TEngine(renderContainer);
-        engine.addObject(...BasicObjectList);
+        engine.addObject(...BasicObjectList, ...LightsList);
 
-        return (() => {
-            // destroy method...
-        })
+        return () => { engine.destroy() };
     }, []);
 
     return <Container>
