@@ -1,12 +1,20 @@
 import { useEffect } from 'react';
 import styled from 'styled-components';
-import threeInit from './threejs/init';
+import { BasicObjectList } from './threejs/TBaseObject';
+import { TEngine } from './threejs/TEngine';
 
 export default function App() {
 
     // Effect
     useEffect(() => {
-        threeInit(document.getElementById('renderContainer'));
+        const renderContainer = document.getElementById('renderContainer');
+        if (renderContainer == null) {
+            throw '找不到renderContainer';
+        }
+
+        const engine = new TEngine(renderContainer);
+        engine.addObject(...BasicObjectList);
+
         return (() => {
             // destroy method...
         })
