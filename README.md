@@ -15,8 +15,13 @@
         ├───global.css  全局CSS样式
         ├───index.tsx   
         │
-        └───threejs     threeJS模块目录
-            ├───init.ts threeJS初始化函数
+        └───threejs             threeJS模块目录
+            ├───TEngine.ts      threeJS核心引擎，通过这个类初始化并绑定DOM对象
+            ├───TBasicObject.ts threeJS基础物体
+            ├───TLights.ts      threeJS光源对象
+            ├───THelper.ts      threeJS辅助器对象
+            ├───TTextures.ts    threeJS纹理、贴图对象
+            ├───TLoadModel.ts   threeJS外部资源加载模块
             ....
 
 
