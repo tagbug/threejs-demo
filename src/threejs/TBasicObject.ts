@@ -25,6 +25,7 @@ export const wall: Mesh = new Mesh(
 )
 wall.position.y = 100;
 wall.position.z = -80;
+wall.receiveShadow = true;
 // 通知wall更新本地矩阵 =>和=> 世界矩阵
 wall.updateMatrix();
 wall.updateMatrixWorld();
@@ -65,5 +66,6 @@ const picture: three.Mesh = new three.Mesh(
 picture.position.y = 140;
 picture.position.z = -70;
 picture.scale.set(0.4, 0.4, 0.4);
+picture.castShadow = true;
 
 BasicObjectList.push(stage, picture, wall);

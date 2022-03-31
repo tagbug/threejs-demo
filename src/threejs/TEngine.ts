@@ -70,6 +70,17 @@ export class TEngine {
 
         // 初始化变换控制器
         const transformControls = new TransformControls(camera, renderer.domElement);
+        let transing = false;
+        transformControls.addEventListener('mouseDown', (e) => {
+            transing = true;
+        })
+        document.addEventListener('keyup', (e) => {
+            switch (e.key) {
+                case "1": transformControls.mode = 'translate'; break;
+                case "2": transformControls.mode = 'scale'; break;
+                case "3": transformControls.mode = 'rotate'; break;
+            }
+        })
 
         // 初始化射线发射器
         const rayCaster = new Raycaster();
@@ -86,11 +97,17 @@ export class TEngine {
             mouse.y = -y * 2 / height + 1;
         })
         renderer.domElement.addEventListener('click', (e) => {
+            if (transing) {
+                transing = false;
+                return;
+            }
             rayCaster.setFromCamera(mouse, camera);
-            const intersection = rayCaster.intersectObjects(scene.children);
+            scene.remove(transformControls);
+            const intersection = rayCaster.intersectObjects(scene.children, false);
             if (intersection.length > 0) {
                 const object = intersection[0].object;
                 transformControls.attach(object);
+                scene.add(transformControls);
             }
         })
 
