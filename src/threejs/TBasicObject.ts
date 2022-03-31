@@ -1,5 +1,5 @@
 import * as three from 'three';
-import { BoxBufferGeometry, Mesh, MeshStandardMaterial } from 'three';
+import { BoxBufferGeometry, Color, Mesh, MeshStandardMaterial } from 'three';
 import { pictureTexture } from './TTextures';
 
 export const BasicObjectList: three.Object3D[] = [];

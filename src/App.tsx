@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { BasicObjectList } from './threejs/TBasicObject';
 import { TEngine } from './threejs/TEngine';
@@ -8,22 +8,33 @@ import { getFrame } from './threejs/TLoadModel';
 
 export default function App() {
 
-    // Effect
-    useEffect(() => {
+    const initEngine = () => {
         const renderContainer = document.getElementById('renderContainer');
         if (renderContainer == null) {
             throw '找不到renderContainer';
         }
 
         const engine = new TEngine(renderContainer);
-        engine.addObject(...BasicObjectList, ...LightsList, ...HelperList);
+        engine.addObjects(...BasicObjectList, ...LightsList);
+        engine.loadDatGui();
 
         getFrame().then(frame => {
-            engine.addObject(frame);
+            engine.addObjects(frame);
         })
+        return engine;
+    }
 
+    // Effect
+    useEffect(() => {
+        let engine = initEngine();
+        global.window.addEventListener('resize', () => {
+            engine.destroy();
+            engine = initEngine();
+        })
         return () => { engine.destroy() };
     }, []);
+
+    
 
     return <Container>
         <div id='renderContainer' />
