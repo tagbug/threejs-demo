@@ -1,14 +1,21 @@
 import * as three from 'three';
-import { MOUSE } from 'three';
+import { MOUSE, Object3D, Raycaster, Vector2 } from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 
 export class TEngine {
     private dom: HTMLElement;
     private renderer: three.WebGLRenderer;
-
     private scene: three.Scene;
     private camera: three.PerspectiveCamera;
+
+    // 物体变换控制器
+    private transformControls: TransformControls;
+    // 射线发射器
+    private rayCaster: Raycaster;
+    // threeJS坐标的鼠标位置
+    private mouse: Vector2;
 
     // 控制requestAnimateFrame
     private frameUpdateRunning: boolean = true;
@@ -21,14 +28,17 @@ export class TEngine {
      */
     constructor(dom: HTMLElement) {
         this.dom = dom;
-        this.renderer = new three.WebGLRenderer({
+        const renderer = new three.WebGLRenderer({
             // 启用抗锯齿处理
             antialias: true,
         });
-        this.scene = new three.Scene();
+        // 开启渲染器的阴影渲染支持
+        renderer.shadowMap.enabled = true;
+
+        const scene = new three.Scene();
         // 将渲染器绑定到指定dom
-        this.renderer.setSize(dom.offsetWidth, dom.offsetHeight, true);
-        this.subDomElem.push(this.renderer.domElement);
+        renderer.setSize(dom.offsetWidth, dom.offsetHeight, true);
+        this.subDomElem.push(renderer.domElement);
         // 添加一个性能监视器
         const stats = Stats();
         stats.domElement.style.position = 'fix';
@@ -38,15 +48,15 @@ export class TEngine {
         this.subDomElem.push(stats.domElement);
 
         // 如果不设置相机位置，则默认在场景原点(0,0,0)
-        this.camera = new three.PerspectiveCamera(45, dom.offsetWidth / dom.offsetHeight, 1, 1000);
+        const camera = new three.PerspectiveCamera(45, dom.offsetWidth / dom.offsetHeight, 1, 1000);
 
         // 设置相机位置、视口
-        this.camera.position.set(20, 20, 20);
-        this.camera.lookAt(new three.Vector3(0, 0, 0));
-        this.camera.up = new three.Vector3(0, 1, 0);
+        camera.position.set(200, 200, 200);
+        camera.lookAt(new three.Vector3(0, 0, 0));
+        camera.up = new three.Vector3(0, 1, 0);
 
         // 初始轨道控制器
-        const orbitControls: OrbitControls = new OrbitControls(this.camera, this.renderer.domElement);
+        const orbitControls: OrbitControls = new OrbitControls(camera, renderer.domElement);
         // 设置自动跟随物体旋转
         // orbitControls.autoRotate = true;
         // 设置操作惯性（阻尼）
@@ -58,18 +68,37 @@ export class TEngine {
             RIGHT: MOUSE.ROTATE,
         };
 
-        // 增加一些辅助工具
-        // 坐标轴
-        const axesHelper: three.AxesHelper = new three.AxesHelper(500);
-        // 地面网格
-        const gridHelper: three.GridHelper = new three.GridHelper(500, 20, 'rgb(200,200,200)', 'rgb(100,100,100)');
+        // 初始化变换控制器
+        const transformControls = new TransformControls(camera, renderer.domElement);
 
-        this.scene.add(axesHelper);
-        this.scene.add(gridHelper);
+        // 初始化射线发射器
+        const rayCaster = new Raycaster();
+
+        // 给renderer的canvas对象添加鼠标事件
+        const mouse = new Vector2();
+        renderer.domElement.addEventListener('mousemove', (e) => {
+            const x = e.offsetX;
+            const y = e.offsetY;
+            // 将鼠标位置坐标转换为threeJS坐标
+            const width = renderer.domElement.offsetWidth;
+            const height = renderer.domElement.offsetHeight;
+            mouse.x = x / width * 2 - 1;
+            mouse.y = -y * 2 / height + 1;
+        })
+        renderer.domElement.addEventListener('click', (e) => {
+            rayCaster.setFromCamera(mouse, camera);
+            const intersection = rayCaster.intersectObjects(scene.children);
+            if (intersection.length > 0) {
+                const object = intersection[0].object;
+                transformControls.attach(object);
+            }
+        })
+
+        scene.add(transformControls);
 
         // 设置清空画布的颜色
-        // this.renderer.setClearColor('rgb(255,255,255)');
-        // this.renderer.clearColor();
+        // renderer.setClearColor('rgb(255,255,255)');
+        // renderer.clearColor();
 
         // 动态渲染
         const renderFun = () => {
@@ -79,11 +108,17 @@ export class TEngine {
                 // 轨道控制器
                 orbitControls.update();
                 // 让渲染器渲染camera相机视角看到的scene的样子
-                this.renderer.render(this.scene, this.camera);
+                renderer.render(scene, camera);
                 requestAnimationFrame(renderFun);
             }
         }
         renderFun();
+        this.renderer = renderer;
+        this.scene = scene;
+        this.camera = camera;
+        this.mouse = mouse;
+        this.transformControls = transformControls;
+        this.rayCaster = rayCaster;
         this.subDomElem.forEach(elem => dom.appendChild(elem));
     }
 

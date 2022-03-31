@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import { BasicObjectList } from './threejs/TBasicObject';
 import { TEngine } from './threejs/TEngine';
+import { HelperList } from './threejs/THelper';
 import { LightsList } from './threejs/TLights';
+import { getFrame } from './threejs/TLoadModel';
 
 export default function App() {
 
@@ -14,7 +16,11 @@ export default function App() {
         }
 
         const engine = new TEngine(renderContainer);
-        engine.addObject(...BasicObjectList, ...LightsList);
+        engine.addObject(...BasicObjectList, ...LightsList, ...HelperList);
+
+        getFrame().then(frame => {
+            engine.addObject(frame);
+        })
 
         return () => { engine.destroy() };
     }, []);
