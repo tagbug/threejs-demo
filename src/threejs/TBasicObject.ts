@@ -1,5 +1,5 @@
 import * as three from 'three';
-import { BoxBufferGeometry, Color, Mesh, MeshStandardMaterial } from 'three';
+import { BoxBufferGeometry, CircleBufferGeometry, Color, ConeBufferGeometry, CylinderBufferGeometry, Line, Mesh, MeshStandardMaterial } from 'three';
 import { pictureTexture } from './TTextures';
 
 export const BasicObjectList: three.Object3D[] = [];
@@ -44,6 +44,34 @@ box.position.y = 10;
 // 允许产生阴影效果
 box.castShadow = true;
 
+// 圆形
+const circle: Mesh = new Mesh(
+    new CircleBufferGeometry(20, 50),
+    new MeshStandardMaterial({
+        color: 'blue',
+        roughness: 0.5
+    })
+)
+circle.position.y = 20;
+
+// 圆锥
+const cone: Line = new Line(
+    new ConeBufferGeometry(30, 80, 50, 50),
+    new MeshStandardMaterial({
+        color: 'white',
+        roughness: 0
+    })
+)
+cone.position.y = 40;
+
+// 圆柱
+const cylinder: Mesh = new Mesh(
+    new CylinderBufferGeometry(),
+    new MeshStandardMaterial({
+        color: 'cyan'
+    })
+)
+
 // 球体
 const sphere: three.Mesh = new three.Mesh(
     new three.SphereBufferGeometry(6),
@@ -68,4 +96,4 @@ picture.position.z = -70;
 picture.scale.set(0.4, 0.4, 0.4);
 picture.castShadow = true;
 
-BasicObjectList.push(stage, picture, wall);
+BasicObjectList.push(stage, picture, wall, cone);

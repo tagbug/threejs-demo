@@ -54,6 +54,13 @@ export class TEngine {
 
         // 如果不设置相机位置，则默认在场景原点(0,0,0)
         const camera = new three.PerspectiveCamera(45, dom.offsetWidth / dom.offsetHeight, 1, 1000);
+        // 增加resize监听
+        function resizeListener() {
+            renderer.setSize(dom.offsetWidth, dom.offsetHeight, true);
+            camera.aspect = dom.offsetWidth / dom.offsetHeight;
+            camera.updateProjectionMatrix();
+        }
+        window.addEventListener('resize', resizeListener);
 
         // 设置相机位置、视口
         camera.position.set(200, 200, 200);
@@ -182,7 +189,7 @@ export class TEngine {
         scene.add(transformControls);
         // 为基础物件添加鼠标事件监听
         const mouseEnterListener = (mesh: Mesh) => {
-            (mesh.material as MeshStandardMaterial).emissive = new Color('yellow');
+            (mesh.material as MeshStandardMaterial).emissive = new Color('rgb(10,10,0)');
         }
         const mouseLeaveListener = (mesh: Mesh) => {
             (mesh.material as MeshStandardMaterial).emissive = new Color('black');

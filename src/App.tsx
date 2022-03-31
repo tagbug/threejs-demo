@@ -27,10 +27,6 @@ export default function App() {
     // Effect
     useEffect(() => {
         let engine = initEngine();
-        global.window.addEventListener('resize', () => {
-            engine.destroy();
-            engine = initEngine();
-        })
         return () => { engine.destroy() };
     }, []);
 

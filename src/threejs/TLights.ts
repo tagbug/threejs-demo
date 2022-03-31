@@ -1,4 +1,5 @@
 import * as three from 'three';
+import { HemisphereLight } from 'three';
 import { wall } from './TBasicObject';
 
 export const LightsList: three.Object3D[] = [];
@@ -13,7 +14,6 @@ export const pointLight: three.PointLight = new three.PointLight(
     30,
     0.1
 )
-pointLight.position.set(20, 20, 20);
 
 // 聚光灯光源
 export const spotLight: three.SpotLight = new three.SpotLight(
@@ -21,12 +21,19 @@ export const spotLight: three.SpotLight = new three.SpotLight(
     1,
     500,
     Math.PI / 180 * 30,
-    0,
-    0
+    0.5,
+    0.3
 )
 spotLight.position.set(0, 100, 400);
 spotLight.target = wall;
 // 允许产生阴影
 spotLight.castShadow = true;
 
-LightsList.push(ambientLight, spotLight);
+// 室外光源
+const hemisphereLight: HemisphereLight = new HemisphereLight(
+    0xffffbb,
+    0x080820,
+    0.4
+)
+
+LightsList.push(ambientLight, spotLight, hemisphereLight);
