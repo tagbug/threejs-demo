@@ -1,18 +1,18 @@
 import * as three from 'three';
-import { HemisphereLight } from 'three';
+import { DirectionalLight, HemisphereLight, RectAreaLight } from 'three';
 import { wall } from './TBasicObject';
 
 export const LightsList: three.Object3D[] = [];
 
 // 环境光
-export const ambientLight: three.AmbientLight = new three.AmbientLight('rgb(255,255,255)', 0.3);
+export const ambientLight: three.AmbientLight = new three.AmbientLight('rgb(255,255,255)', 0.1);
 
 // 点光源
 export const pointLight: three.PointLight = new three.PointLight(
-    'rgb(255, 255, 0)',
-    0.7,
-    30,
-    0.1
+    0xff9000,
+    0.3,
+    500,
+    2
 )
 
 // 聚光灯光源
@@ -25,14 +25,23 @@ export const spotLight: three.SpotLight = new three.SpotLight(
     0.3
 )
 spotLight.position.set(0, 100, 400);
+spotLight.target = wall;
 // 允许产生阴影
 spotLight.castShadow = true;
+// 优化阴影效果
+spotLight.shadow.mapSize.set(4096, 4096);
+spotLight.shadow.camera.near = 150;
+spotLight.shadow.camera.far = 500;
 
-// 室外光源
-const hemisphereLight: HemisphereLight = new HemisphereLight(
-    0xffffbb,
-    0x080820,
-    0.4
-)
+// 平行光
+export const directionLight = new DirectionalLight(0xffffff, 0.3);
+directionLight.position.set(1, 0.25, 0);
 
-LightsList.push(ambientLight, spotLight, hemisphereLight);
+// 半球光
+export const hemisphereLight = new HemisphereLight(0xff0000, 0x0000ff, 0.1);
+
+// 平面光
+export const rectAreaLight = new RectAreaLight(0x4e00ff, 2, 100, 100);
+rectAreaLight.position.set(0, 40, 50);
+
+LightsList.push(spotLight, directionLight, pointLight, hemisphereLight, rectAreaLight);

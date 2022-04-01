@@ -18,4 +18,4 @@ const sprite = new Sprite(
 sprite.position.set(70, 20, 0);
 sprite.scale.set(50, 50, 1);
 
-SpriteList.push(spriteNormal, sprite);
+SpriteList.push();

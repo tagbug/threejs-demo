@@ -1,6 +1,6 @@
 import * as three from 'three';
-import { BoxBufferGeometry, CircleBufferGeometry, Color, ConeBufferGeometry, CylinderBufferGeometry, Line, Mesh, MeshStandardMaterial } from 'three';
-import { pictureTexture } from './TTextures';
+import { BoxBufferGeometry, CircleBufferGeometry, Color, ConeBufferGeometry, CylinderBufferGeometry, Line, Mesh, MeshMatcapMaterial, MeshStandardMaterial, TorusBufferGeometry } from 'three';
+import { matcapTexture, pictureTexture } from './TTextures';
 
 export const BasicObjectList: three.Object3D[] = [];
 
@@ -8,11 +8,11 @@ export const BasicObjectList: three.Object3D[] = [];
 const stage: three.Mesh = new three.Mesh(
     new three.BoxBufferGeometry(600, 10, 400),
     new three.MeshStandardMaterial({
-        color: 'rgb(0, 75, 75)',
+        color: 0xffffff,
         roughness: 0,
     })
 )
-stage.position.y = -5;
+stage.position.y = -20;
 // 允许接受阴影效果
 stage.receiveShadow = true;
 
@@ -26,9 +26,6 @@ export const wall: Mesh = new Mesh(
 wall.position.y = 100;
 wall.position.z = -80;
 wall.receiveShadow = true;
-// 通知wall更新本地矩阵 =>和=> 世界矩阵
-wall.updateMatrix();
-wall.updateMatrixWorld();
 
 // 立方体
 const box: three.Mesh = new three.Mesh(
@@ -96,4 +93,21 @@ picture.position.z = -70;
 picture.scale.set(0.4, 0.4, 0.4);
 picture.castShadow = true;
 
-BasicObjectList.push(stage, picture, wall, cone);
+// 圆环
+const donutGeometry = new TorusBufferGeometry(10, 6, 20, 45);
+const donutMaterial = new MeshStandardMaterial({ roughness: 0 });
+for (let i = 0; i < 1000; i++) {
+    // 创建100个甜甜圈随机分布在scene中
+    const donut = new Mesh(
+        donutGeometry,
+        donutMaterial
+    )
+    donut.position.set((0.5 - Math.random()) * 600, (0.5 - Math.random()) * 600, (0.5 - Math.random()) * 500);
+    donut.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+    const scale = Math.random();
+    donut.scale.set(scale, scale, scale);
+    donut.castShadow = true;
+    BasicObjectList.push(donut);
+}
+
+BasicObjectList.push(stage, wall);

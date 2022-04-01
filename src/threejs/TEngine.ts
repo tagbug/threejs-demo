@@ -4,7 +4,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as dat from 'dat.gui';
-import { HelperList } from './THelper';
+import { BasicHelperList, CameraHelperList, LightHelperList, rectAreaLightHelperUpdate, spotLightHelperUpdate } from './THelper';
 import { BasicObjectList } from './TBasicObject';
 
 export class TEngine {
@@ -26,7 +26,10 @@ export class TEngine {
     private frameUpdateRunning: boolean = true;
     // 挂载到dom下的子dom
     private subDomElem: HTMLElement[] = [];
+    // DatGui
     private datGui: dat.GUI | null = null;
+    // 每次要在reqAniFrame中执行的额外
+    private aniFunctions: Function[] = [];
 
     /**
      * 构建一个新的渲染器+场景，并将其挂载到给定的DOM节点下
@@ -87,6 +90,8 @@ export class TEngine {
         // 动态渲染
         const renderFun = () => {
             if (this.frameUpdateRunning) {
+                // 执行自定义方法
+                this.aniFunctions.forEach(fun => fun());
                 // 性能监视
                 stats.update();
                 // 轨道控制器
@@ -180,6 +185,7 @@ export class TEngine {
             rayCaster.setFromCamera(mouse, camera);
             transformControls.visible = false;
             const intersection = rayCaster.intersectObjects(scene.children, false);
+            console.log('拾取器', intersection);
             if (intersection.length > 0) {
                 const object = intersection[0].object;
                 transformControls.attach(object);
@@ -264,22 +270,60 @@ export class TEngine {
      */
     loadDatGui() {
         const config = {
-            // 基础Helper（坐标轴、spotLightHelper、网格Helper）
-            enableHelpers: false,
+            // 基础Helper（坐标轴、(Desperate)网格Helper）
+            basicHelper: false,
+            // 光源Helper
+            lightHelper: false,
+            // 摄像机Helpers
+            cameraHelper: false,
             // 射线拾取+变换控制器（键盘1->移动 2->scale 3->旋转）
             enableTransformControl: false,
         }
         const gui = new dat.GUI();
-        gui.add(config, 'enableHelpers').onChange((enableHelpers) => {
-            if (enableHelpers) {
-                this.addObjects(...HelperList);
+        const helper = gui.addFolder('Helper');
+        helper.add(config, 'basicHelper').onChange((enable) => {
+            if (enable) {
+                this.addObjects(...BasicHelperList);
             } else {
-                this.removeObjects(...HelperList);
+                this.removeObjects(...BasicHelperList);
             }
         });
+        helper.add(config, 'lightHelper').onChange((enable) => {
+            if (enable) {
+                this.addObjects(...LightHelperList);
+                this.addFunctionToAni(spotLightHelperUpdate, rectAreaLightHelperUpdate);
+            } else {
+                this.removeObjects(...LightHelperList);
+                this.removeFunctionFromAni(spotLightHelperUpdate, rectAreaLightHelperUpdate);
+            }
+        });
+        helper.add(config, 'cameraHelper').onChange(enable => {
+            if (enable) {
+                this.addObjects(...CameraHelperList);
+            } else {
+                this.removeObjects(...CameraHelperList);
+            }
+        })
         gui.add(config, 'enableTransformControl').onChange((enableTransformControl) => {
             enableTransformControl ? this.initTransformControl() : this.destroyTransformControl();
         });
         this.datGui = gui;
+    }
+
+
+    /**
+     * 添加方法到requestAnimateFrame的执行流程中
+     * @param funs 要添加的方法
+     */
+    addFunctionToAni(...funs: Function[]) {
+        this.aniFunctions.push(...funs);
+    }
+
+    /**
+     * 将方法从requestAnimateFrame中移除
+     * @param funs 要移除的方法
+     */
+    removeFunctionFromAni(...funs: Function[]) {
+        this.aniFunctions = this.aniFunctions.filter(item => !funs.includes(item));
     }
 }
