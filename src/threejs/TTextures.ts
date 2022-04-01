@@ -4,6 +4,7 @@ import * as three from 'three';
 const textureLoader: three.TextureLoader = new three.TextureLoader();
 
 export const pictureTexture: three.Texture = textureLoader.load('/img/plane.jpg');
+export const saluteTexture: three.Texture = textureLoader.load('/img/salute.jpg');
 
 export const frameColorTexture = textureLoader.load('/ambient/WoodFloor024_1K_Color.jpg')
 export const frameRoughnessTexture = textureLoader.load('/ambient/WoodFloor024_1K_Roughness.jpg')

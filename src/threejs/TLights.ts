@@ -25,7 +25,6 @@ export const spotLight: three.SpotLight = new three.SpotLight(
     0.3
 )
 spotLight.position.set(0, 100, 400);
-spotLight.target = wall;
 // 允许产生阴影
 spotLight.castShadow = true;
 

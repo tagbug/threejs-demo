@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { BasicObjectList } from './threejs/TBasicObject';
 import { TEngine } from './threejs/TEngine';
+import { getTextExample } from './threejs/TFont';
 import { HelperList } from './threejs/THelper';
 import { LightsList } from './threejs/TLights';
 import { getFrame } from './threejs/TLoadModel';
+import { SpriteList } from './threejs/TSprite';
 
 export default function App() {
 
@@ -15,11 +17,14 @@ export default function App() {
         }
 
         const engine = new TEngine(renderContainer);
-        engine.addObjects(...BasicObjectList, ...LightsList);
+        engine.addObjects(...BasicObjectList, ...LightsList, ...SpriteList);
         engine.loadDatGui();
 
         getFrame().then(frame => {
             engine.addObjects(frame);
+        })
+        getTextExample().then(text => {
+            engine.addObjects(text);
         })
         return engine;
     }
@@ -30,7 +35,7 @@ export default function App() {
         return () => { engine.destroy() };
     }, []);
 
-    
+
 
     return <Container>
         <div id='renderContainer' />
