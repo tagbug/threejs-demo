@@ -101,6 +101,8 @@ export class TEngine {
         this.scene = scene;
         this.camera = camera;
         this.subDomElem.forEach(elem => dom.appendChild(elem));
+        console.log('TEngine load success');
+        console.log('右键旋转，Ctrl+右键平移，鼠标滚轮缩放，enableTransformControl启用时，左键拾取物体');
     }
 
     /**
@@ -254,7 +256,7 @@ export class TEngine {
         this.renderer.dispose();
         this.destroyTransformControl();
         this.datGui?.destroy();
-        console.log('destroyed...');
+        console.log('TEngine destroyed...');
     }
 
     /**
@@ -262,7 +264,9 @@ export class TEngine {
      */
     loadDatGui() {
         const config = {
+            // 基础Helper（坐标轴、spotLightHelper、网格Helper）
             enableHelpers: false,
+            // 射线拾取+变换控制器（键盘1->移动 2->scale 3->旋转）
             enableTransformControl: false,
         }
         const gui = new dat.GUI();
