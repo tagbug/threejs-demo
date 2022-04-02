@@ -6,7 +6,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import * as dat from 'dat.gui';
 import { BasicHelperList, CameraHelperList, LightHelperList, rectAreaLightHelperUpdate, spotLightHelperUpdate } from './THelper';
 import { BasicObjectList } from './TBasicObject';
-import { createPhysicSphere } from './TPhysics';
+import { createPhysicBox, createPhysicSphere } from './TPhysics';
 
 export class TEngine {
     private dom: HTMLElement;
@@ -69,7 +69,7 @@ export class TEngine {
         window.addEventListener('resize', resizeListener);
 
         // 设置相机位置、视口
-        camera.position.set(200, 200, 200);
+        camera.position.set(300, 100, 300);
         camera.lookAt(new three.Vector3(0, 0, 0));
         camera.up = new three.Vector3(0, 1, 0);
 
@@ -316,13 +316,28 @@ export class TEngine {
                     this.scene,
                     Math.random() * 5 + 5,
                     {
-                        x: (Math.random() - 0.5) * 3,
+                        x: (Math.random() - 0.5) * 100,
                         y: 30,
-                        z: (Math.random() - 0.5) * 3,
+                        z: (Math.random() - 0.5) * 100,
                     }
                 )
             }
         }, 'createPhysicsSphere');
+        gui.add({
+            createPhysicsBox: () => {
+                createPhysicBox(
+                    this.scene,
+                    Math.random() * 5 + 15,
+                    Math.random() * 5 + 15,
+                    Math.random() * 5 + 15,
+                    {
+                        x: (Math.random() - 0.5) * 100,
+                        y: 30,
+                        z: (Math.random() - 0.5) * 100,
+                    }
+                )
+            }
+        }, 'createPhysicsBox');
         this.datGui = gui;
     }
 
