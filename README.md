@@ -15,6 +15,10 @@
         ├───global.css  全局CSS样式
         ├───index.tsx   
         │
+        ├───utils           实用工具目录
+        │   ├───HOF.ts      封装常用高阶函数
+        │   ....
+        │       
         └───threejs             threeJS模块目录
             ├───TEngine.ts      threeJS核心引擎，通过这个类初始化并绑定DOM对象
             ├───TBasicObject.ts threeJS基础物体
@@ -25,6 +29,7 @@
             ├───TFont.ts        threeJS字体、文字对象
             ├───TLoadModel.ts   threeJS外部资源加载模块
             ├───TPhysics.ts     threeJS+CANNON 物理效果模块
+            ├───TSound.ts       声音资源模块
             ....
 
 
