@@ -7,7 +7,6 @@ export const throttle: HOF = (fun, time) => {
         let now = Date.now();
         if (timeEnd < now) {
             timeEnd = now + time;
-            console.log('called', now, timeEnd, now - timeEnd);
             return fun.apply(this, args);
         }
     }

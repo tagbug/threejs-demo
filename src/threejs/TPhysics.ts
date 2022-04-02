@@ -2,7 +2,7 @@ import * as cannon from 'cannon';
 import { BoxBufferGeometry, Clock, Mesh, MeshStandardMaterial, Quaternion, Scene, SphereBufferGeometry, Vector3 } from 'three';
 import { throttle } from '../utils/HOF';
 import { sphere, stage } from './TBasicObject';
-import { playWoodHitSound } from './TSound';
+import { playHitSound, woodHitSound2, woodHitSound } from './TSound';
 
 // World
 const world = new cannon.World();
@@ -58,6 +58,7 @@ export const createPhysicSphere = (scene: Scene, radius: number, position: Posit
         position: position as cannon.Vec3,
         shape: new cannon.Sphere(radius)
     })
+    physicsSphere.addEventListener('collide', throttle(playHitSound.bind(this, woodHitSound2), 100));
     world.addBody(physicsSphere);
     objectToUpdate.push({ mesh: sphere, body: physicsSphere });
 }
@@ -78,7 +79,7 @@ export const createPhysicBox = (scene: Scene, width: number, height: number, dep
         position: position as cannon.Vec3,
         shape: new cannon.Box(new cannon.Vec3(width / 2, height / 2, depth / 2)),
     })
-    physicsBox.addEventListener('collide', throttle(playWoodHitSound, 100));
+    physicsBox.addEventListener('collide', throttle(playHitSound.bind(this, woodHitSound), 100));
     world.addBody(physicsBox);
     objectToUpdate.push({ mesh: box, body: physicsBox });
 }
