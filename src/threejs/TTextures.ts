@@ -11,3 +11,5 @@ export const frameRoughnessTexture = textureLoader.load('/ambient/WoodFloor024_1
 export const frameDisplaceTexture = textureLoader.load('/ambient/WoodFloor024_1K_Displacement.jpg');
 
 export const matcapTexture = textureLoader.load('/matcaps/256/C7C7D7_4C4E5A_818393_6C6C74-256px.png');
+
+export const particleTexture = textureLoader.load('/particle/Black/star_04.png');

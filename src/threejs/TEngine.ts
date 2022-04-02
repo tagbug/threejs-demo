@@ -43,6 +43,8 @@ export class TEngine {
         });
         // 开启渲染器的阴影渲染支持
         renderer.shadowMap.enabled = true;
+        // 更换质量更好的/更耗性能的阴影算法，但不支持阴影过渡半径
+        // renderer.shadowMap.type = three.PCFSoftShadowMap;
 
         const scene = new three.Scene();
         // 将渲染器绑定到指定dom

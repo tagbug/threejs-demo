@@ -30,8 +30,11 @@ spotLight.target = wall;
 spotLight.castShadow = true;
 // 优化阴影效果
 spotLight.shadow.mapSize.set(4096, 4096);
+// 通过优化摄影机视角范围来得到更精细的阴影效果
 spotLight.shadow.camera.near = 150;
 spotLight.shadow.camera.far = 500;
+// 设置阴影过渡半径
+// spotLight.shadow.radius = 10;
 
 // 平行光
 export const directionLight = new DirectionalLight(0xffffff, 0.3);

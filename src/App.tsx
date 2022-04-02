@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { BasicObjectList } from './threejs/TBasicObject';
+import { Clock } from 'three';
+import { BasicObjectList, sphere } from './threejs/TBasicObject';
 import { TEngine } from './threejs/TEngine';
 import { getTextExample } from './threejs/TFont';
 import { BasicHelperList } from './threejs/THelper';
 import { LightsList } from './threejs/TLights';
 import { getFrame } from './threejs/TLoadModel';
-import { SpriteList } from './threejs/TSprite';
+import { ParticleList, particlesAnimation, SpriteList } from './threejs/TSprite';
 
 export default function App() {
 
@@ -17,9 +18,13 @@ export default function App() {
         }
 
         const engine = new TEngine(renderContainer);
-        engine.addObjects(...BasicObjectList, ...LightsList, ...SpriteList);
+        engine.addObjects(...BasicObjectList, ...LightsList, ...SpriteList, ...ParticleList);
         engine.loadDatGui();
-
+        const clock = new Clock();
+        engine.addFunctionToAni(() => {
+            const t = clock.getElapsedTime();
+            sphere.position.set(Math.cos(t) * 30, Math.abs(Math.sin(t * 3) * 30), Math.sin(t) * 30);
+        }, particlesAnimation);
         return engine;
     }
 

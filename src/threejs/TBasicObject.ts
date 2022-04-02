@@ -70,14 +70,14 @@ const cylinder: Mesh = new Mesh(
 )
 
 // 球体
-const sphere: three.Mesh = new three.Mesh(
-    new three.SphereBufferGeometry(6),
+export const sphere: three.Mesh = new three.Mesh(
+    new three.SphereBufferGeometry(20),
     new three.MeshStandardMaterial({
         roughness: 0,
         map: pictureTexture
     })
 )
-sphere.position.y = 6;
+sphere.position.y = 5;
 sphere.position.z = 20;
 sphere.castShadow = true;
 
@@ -96,7 +96,7 @@ picture.castShadow = true;
 // 圆环
 const donutGeometry = new TorusBufferGeometry(10, 6, 20, 45);
 const donutMaterial = new MeshStandardMaterial({ roughness: 0 });
-for (let i = 0; i < 1000; i++) {
+/* for (let i = 0; i < 1000; i++) {
     // 创建100个甜甜圈随机分布在scene中
     const donut = new Mesh(
         donutGeometry,
@@ -108,6 +108,6 @@ for (let i = 0; i < 1000; i++) {
     donut.scale.set(scale, scale, scale);
     donut.castShadow = true;
     BasicObjectList.push(donut);
-}
+} */
 
-BasicObjectList.push(stage, wall);
+BasicObjectList.push(stage, wall, sphere);
