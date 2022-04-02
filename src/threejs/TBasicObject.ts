@@ -5,8 +5,8 @@ import { matcapTexture, pictureTexture } from './TTextures';
 export const BasicObjectList: three.Object3D[] = [];
 
 // 地面
-const stage: three.Mesh = new three.Mesh(
-    new three.BoxBufferGeometry(600, 10, 400),
+export const stage: three.Mesh = new three.Mesh(
+    new three.BoxBufferGeometry(1200, 0.1, 1200),
     new three.MeshStandardMaterial({
         color: 0xffffff,
         roughness: 0,
@@ -110,4 +110,4 @@ const donutMaterial = new MeshStandardMaterial({ roughness: 0 });
     BasicObjectList.push(donut);
 } */
 
-BasicObjectList.push(stage, wall, sphere);
+BasicObjectList.push(stage);

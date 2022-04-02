@@ -7,6 +7,7 @@ import { getTextExample } from './threejs/TFont';
 import { BasicHelperList } from './threejs/THelper';
 import { LightsList } from './threejs/TLights';
 import { getFrame } from './threejs/TLoadModel';
+import { physicsUpdate } from './threejs/TPhysics';
 import { ParticleList, particlesAnimation, SpriteList } from './threejs/TSprite';
 
 export default function App() {
@@ -22,9 +23,9 @@ export default function App() {
         engine.loadDatGui();
         const clock = new Clock();
         engine.addFunctionToAni(() => {
-            const t = clock.getElapsedTime();
-            sphere.position.set(Math.cos(t) * 30, Math.abs(Math.sin(t * 3) * 30), Math.sin(t) * 30);
-        }, particlesAnimation);
+            // const t = clock.getElapsedTime();
+            // sphere.position.set(Math.cos(t) * 30, Math.abs(Math.sin(t * 3) * 30), Math.sin(t) * 30);
+        }, physicsUpdate);
         return engine;
     }
 

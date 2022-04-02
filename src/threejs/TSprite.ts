@@ -62,4 +62,4 @@ export const particlesAnimation = () => {
 }
 
 SpriteList.push();
-ParticleList.push(particles);
+ParticleList.push();

@@ -24,6 +24,7 @@
             ├───TSprite.ts      threeJS精灵、粒子对象
             ├───TFont.ts        threeJS字体、文字对象
             ├───TLoadModel.ts   threeJS外部资源加载模块
+            ├───TPhysics.ts     threeJS+CANNON 物理效果模块
             ....
 
 

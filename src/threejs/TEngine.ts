@@ -6,6 +6,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import * as dat from 'dat.gui';
 import { BasicHelperList, CameraHelperList, LightHelperList, rectAreaLightHelperUpdate, spotLightHelperUpdate } from './THelper';
 import { BasicObjectList } from './TBasicObject';
+import { createPhysicSphere } from './TPhysics';
 
 export class TEngine {
     private dom: HTMLElement;
@@ -187,8 +188,8 @@ export class TEngine {
             rayCaster.setFromCamera(mouse, camera);
             transformControls.visible = false;
             const intersection = rayCaster.intersectObjects(scene.children, false);
-            console.log('拾取器', intersection);
             if (intersection.length > 0) {
+                console.log('拾取器', intersection);
                 const object = intersection[0].object;
                 transformControls.attach(object);
                 transformControls.visible = true;
@@ -309,6 +310,19 @@ export class TEngine {
         gui.add(config, 'enableTransformControl').onChange((enableTransformControl) => {
             enableTransformControl ? this.initTransformControl() : this.destroyTransformControl();
         });
+        gui.add({
+            createPhysicsSphere: () => {
+                createPhysicSphere(
+                    this.scene,
+                    Math.random() * 5 + 5,
+                    {
+                        x: (Math.random() - 0.5) * 3,
+                        y: 30,
+                        z: (Math.random() - 0.5) * 3,
+                    }
+                )
+            }
+        }, 'createPhysicsSphere');
         this.datGui = gui;
     }
 
