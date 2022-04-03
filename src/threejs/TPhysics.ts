@@ -100,3 +100,10 @@ export const physicsUpdate = () => {
         item.mesh.quaternion.copy(item.body.quaternion as unknown as Quaternion);
     }
 }
+
+export const destroyPhysicsWorld = (scene: Scene) => {
+    objectToUpdate.forEach(item => {
+        world.remove(item.body);
+        scene.remove(item.mesh);
+    })
+}

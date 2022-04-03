@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Clock } from 'three';
+import { playFoxAnimation } from './threejs/TAnimation';
 import { BasicObjectList, sphere } from './threejs/TBasicObject';
 import { TEngine } from './threejs/TEngine';
 import { getTextExample } from './threejs/TFont';
 import { BasicHelperList } from './threejs/THelper';
 import { LightsList } from './threejs/TLights';
-import { getFrame } from './threejs/TLoadModel';
+import { getDuckModel, getFlightHelmetModel, getFoxModel, getFrame } from './threejs/TLoadModel';
 import { physicsUpdate } from './threejs/TPhysics';
 import { ParticleList, particlesAnimation, SpriteList } from './threejs/TSprite';
 
@@ -26,6 +27,12 @@ export default function App() {
             // const t = clock.getElapsedTime();
             // sphere.position.set(Math.cos(t) * 30, Math.abs(Math.sin(t * 3) * 30), Math.sin(t) * 30);
         }, physicsUpdate);
+        getFoxModel().then(model => {
+            // model.scene.scale.set(200, 200, 200);
+            model.scene.position.set(0, -20, 0);
+            engine.addObjects(model.scene);
+            engine.addFunctionToAni(playFoxAnimation(model, 2));
+        })
         return engine;
     }
 

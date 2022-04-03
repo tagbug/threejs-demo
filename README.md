@@ -27,6 +27,7 @@
             ├───TTextures.ts    threeJS纹理、贴图对象
             ├───TSprite.ts      threeJS精灵、粒子对象
             ├───TFont.ts        threeJS字体、文字对象
+            ├───TAnimation.ts   threeJS动画处理模块
             ├───TLoadModel.ts   threeJS外部资源加载模块
             ├───TPhysics.ts     threeJS+CANNON 物理效果模块
             ├───TSound.ts       声音资源模块

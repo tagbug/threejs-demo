@@ -10,10 +10,10 @@ export const ambientLight: three.AmbientLight = new three.AmbientLight('rgb(255,
 // 点光源
 export const pointLight: three.PointLight = new three.PointLight(
     0xff9000,
-    0.3,
-    500,
-    2
+    0.8,
+    800,
 )
+pointLight.position.set(0, 100, -100);
 
 // 聚光灯光源
 export const spotLight: three.SpotLight = new three.SpotLight(
@@ -37,7 +37,7 @@ spotLight.shadow.camera.far = 500;
 // spotLight.shadow.radius = 10;
 
 // 平行光
-export const directionLight = new DirectionalLight(0xffffff, 0.3);
+export const directionLight = new DirectionalLight(0xffffff, 0.6);
 directionLight.position.set(1, 0.25, 0);
 
 // 半球光
@@ -47,4 +47,4 @@ export const hemisphereLight = new HemisphereLight(0xff0000, 0x0000ff, 0.1);
 export const rectAreaLight = new RectAreaLight(0x4e00ff, 2, 100, 100);
 rectAreaLight.position.set(0, 40, 50);
 
-LightsList.push(spotLight, directionLight, pointLight, hemisphereLight, rectAreaLight);
+LightsList.push(spotLight, directionLight, pointLight, hemisphereLight);

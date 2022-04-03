@@ -6,7 +6,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import * as dat from 'dat.gui';
 import { BasicHelperList, CameraHelperList, LightHelperList, rectAreaLightHelperUpdate, spotLightHelperUpdate } from './THelper';
 import { BasicObjectList } from './TBasicObject';
-import { createPhysicBox, createPhysicSphere } from './TPhysics';
+import { createPhysicBox, createPhysicSphere, destroyPhysicsWorld } from './TPhysics';
 
 export class TEngine {
     private dom: HTMLElement;
@@ -262,6 +262,8 @@ export class TEngine {
     destroy() {
         this.frameUpdateRunning = false;
         this.subDomElem.forEach(elem => this.dom.removeChild(elem));
+        destroyPhysicsWorld(this.scene);
+        this.scene.children.forEach(item => this.scene.remove(item));
         this.renderer.dispose();
         this.destroyTransformControl();
         this.datGui?.destroy();
@@ -338,6 +340,11 @@ export class TEngine {
                 )
             }
         }, 'createPhysicsBox');
+        gui.add({
+            reset: () => {
+                destroyPhysicsWorld(this.scene);
+            }
+        }, 'reset');
         this.datGui = gui;
     }
 
