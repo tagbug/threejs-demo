@@ -37,8 +37,12 @@ spotLight.shadow.camera.far = 500;
 // spotLight.shadow.radius = 10;
 
 // 平行光
-export const directionLight = new DirectionalLight(0xffffff, 1);
-directionLight.position.set(0.25, 3, -2.25);
+export const directionLight = new DirectionalLight(0xffffff, 3);
+directionLight.position.set(2.5, 12, -14.5);
+directionLight.castShadow = true;
+directionLight.shadow.mapSize.set(2048, 2048);
+directionLight.shadow.camera.scale.set(2, 2, 2);
+directionLight.shadow.camera.far = 30;
 
 // 半球光
 export const hemisphereLight = new HemisphereLight(0xff0000, 0x0000ff, 0.1);

@@ -40,13 +40,21 @@ export class TEngine {
     constructor(dom: HTMLElement) {
         this.dom = dom;
         const renderer = new three.WebGLRenderer({
-            // 启用抗锯齿处理
+            // 启用抗锯齿处理（默认为MSAA）
             antialias: true,
         });
         // 开启渲染器的阴影渲染支持
         renderer.shadowMap.enabled = true;
         // 更换质量更好的/更耗性能的阴影算法，但不支持阴影过渡半径
-        // renderer.shadowMap.type = three.PCFSoftShadowMap;
+        renderer.shadowMap.type = three.PCFSoftShadowMap;
+        // 更换渲染输出解码器，得到更真实的画面品质（默认位LinearEncoding）
+        // 工作原理：由于人眼对于亮度较高的部分的敏感度比亮度较低的部分小，sRGBEncoding会让亮度值以非线性但更容易被人眼感知的方式调整，而LinearEncoding（默认值）则是将亮度等级平分，所以在高亮度区域人眼更难察觉到不同
+        // 当使用sRBG的图片时，使用这个解码器才能还原真实色彩
+        renderer.outputEncoding = three.sRGBEncoding;
+        // 调节参数让渲染更真实
+        renderer.physicallyCorrectLights = true;
+        renderer.toneMapping = three.ReinhardToneMapping;
+        renderer.toneMappingExposure = 3;
 
         const scene = new three.Scene();
         // 将渲染器绑定到指定dom
@@ -366,13 +374,38 @@ export class TEngine {
         const folder = gui.addFolder('Realistic Render');
         folder.add(directionLight, 'intensity').min(0).max(10).step(0.001).name('lightIntensity');
         folder.add(directionLight.position, 'x').min(-5).max(5).step(0.001).name('lightX');
-        folder.add(directionLight.position, 'y').min(-5).max(5).step(0.001).name('lightY');
-        folder.add(directionLight.position, 'z').min(-5).max(5).step(0.001).name('lightZ');
+        folder.add(directionLight.position, 'y').min(-20).max(20).step(0.001).name('lightY');
+        folder.add(directionLight.position, 'z').min(-20).max(20).step(0.001).name('lightZ');
         folder.add(this.renderer, 'physicallyCorrectLights');
-        folder.add({ envMapIntensity: 1 }, 'envMapIntensity').min(1).max(10).step(0.001).onChange(val => {
+        folder.add({ envMapIntensity: 5 }, 'envMapIntensity').min(1).max(10).step(0.001).onChange(val => {
             this.scene.traverse(item => {
                 if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
                     item.material.envMapIntensity = val;
+                }
+            })
+        })
+        folder.add(this.renderer, 'toneMapping', {
+            No: three.NoToneMapping,
+            Linear: three.LinearToneMapping,
+            Reinhard: three.ReinhardToneMapping,
+            Cineon: three.CineonToneMapping,
+            ACESFilmic: three.ACESFilmicToneMapping,
+        }).onFinishChange(() => {
+            // 这是js或者datGui的一个bug，enum值会被自动转换为string，所以要手动再次转换回来
+            this.renderer.toneMapping = Number(this.renderer.toneMapping);
+            // 更新场景中的物体材质以应用toneMapping
+            this.scene.traverse(item => {
+                if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
+                    item.material.needsUpdate = true;
+                }
+            })
+        });
+        folder.add(this.renderer, 'toneMappingExposure').min(1).max(5).step(0.001);
+        folder.add({ shadow: false }, 'shadow').onChange(enable => {
+            this.scene.traverse(item => {
+                if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
+                    item.castShadow = enable;
+                    item.receiveShadow = enable;
                 }
             })
         })
@@ -399,15 +432,20 @@ export class TEngine {
     /**
      * 向场景以及场景中的所有元素应用指定的环境贴图
      * @param environmentMap 指定环境贴图
+     * @param intensity 环境贴图强度
      */
-    updateEnvironmentMap(environmentMap: CubeTexture) {
+    updateEnvironmentMap(environmentMap: CubeTexture, intensity?: number) {
         if (this.scene.environment !== environmentMap) {
             this.scene.background = environmentMap;
+            this.scene.environment = environmentMap;
         }
         this.scene.traverse(item => {
             if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
                 // 只对Mesh物体并且位MeshStandardMaterial材质应用
-                item.material.envMap = environmentMap;
+                // item.material.envMapIntensity = environmentMap;
+                if (intensity !== undefined) {
+                    item.material.envMapIntensity = intensity;
+                }
             }
         })
     }

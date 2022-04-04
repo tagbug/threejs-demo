@@ -38,7 +38,7 @@ export default function App() {
                 .step(0.001)
                 .name('modelRotation');
             engine.addObjects(model.scene);
-            engine.updateEnvironmentMap(environmentMap);
+            engine.updateEnvironmentMap(environmentMap, 5);
         })
         return engine;
     }

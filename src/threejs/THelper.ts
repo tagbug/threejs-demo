@@ -34,11 +34,11 @@ export const rectAreaLightHelperUpdate = () => {
 }
 
 // 摄影机Helper
-const spotLightCameraHelper = new CameraHelper(spotLight.shadow.camera);
+const cameraHelper = new CameraHelper(directionLight.shadow.camera);
 
 BasicHelperList.push(axesHelper);
-LightHelperList.push(hemisphereLightHelper, directionalLightHelper, pointLightHelper, rectAreaLightHelper, spotLightHelper);
-CameraHelperList.push(spotLightCameraHelper);
+LightHelperList.push( directionalLightHelper);
+CameraHelperList.push(cameraHelper);
 
 // 让射线拾取器不会拾取这些Helper
 BasicHelperList.forEach(item => {

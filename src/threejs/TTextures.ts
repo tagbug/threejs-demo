@@ -26,3 +26,5 @@ export const environmentMap = cubeTextureLoader.load([
     '/texture/environmentMaps/0/pz.jpg',
     '/texture/environmentMaps/0/nz.jpg'
 ])
+// 更换渲染输出解码器，获得更真实的色彩，原因同renderer
+environmentMap.encoding = three.sRGBEncoding;
