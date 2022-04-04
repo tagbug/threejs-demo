@@ -31,6 +31,7 @@
             ├───TLoadModel.ts   threeJS外部资源加载模块
             ├───TPhysics.ts     threeJS+CANNON 物理效果模块
             ├───TSound.ts       声音资源模块
+            ├───DatGui.ts       为engine提供DatGui面板支持
             ....
 
 

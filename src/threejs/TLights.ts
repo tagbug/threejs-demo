@@ -40,6 +40,8 @@ spotLight.shadow.camera.far = 500;
 export const directionLight = new DirectionalLight(0xffffff, 3);
 directionLight.position.set(2.5, 12, -14.5);
 directionLight.castShadow = true;
+// 设置法线偏移，使得物体自身的影子不会忽明忽暗
+directionLight.shadow.normalBias = 0.05;
 directionLight.shadow.mapSize.set(2048, 2048);
 directionLight.shadow.camera.scale.set(2, 2, 2);
 directionLight.shadow.camera.far = 30;

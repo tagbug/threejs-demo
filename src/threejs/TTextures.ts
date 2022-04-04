@@ -19,12 +19,12 @@ export const particleTexture = textureLoader.load('/particle/Black/star_04.png')
 
 // Environment map
 export const environmentMap = cubeTextureLoader.load([
-    '/texture/environmentMaps/0/px.jpg',
-    '/texture/environmentMaps/0/nx.jpg',
-    '/texture/environmentMaps/0/py.jpg',
-    '/texture/environmentMaps/0/ny.jpg',
-    '/texture/environmentMaps/0/pz.jpg',
-    '/texture/environmentMaps/0/nz.jpg'
+    '/texture/environmentMaps/3/px.jpg',
+    '/texture/environmentMaps/3/nx.jpg',
+    '/texture/environmentMaps/3/py.jpg',
+    '/texture/environmentMaps/3/ny.jpg',
+    '/texture/environmentMaps/3/pz.jpg',
+    '/texture/environmentMaps/3/nz.jpg'
 ])
 // 更换渲染输出解码器，获得更真实的色彩，原因同renderer
 environmentMap.encoding = three.sRGBEncoding;

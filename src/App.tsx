@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Clock } from 'three';
+import { loadDatGui } from './threejs/DatGui';
 import { playFoxAnimation } from './threejs/TAnimation';
 import { BasicObjectList, sphere } from './threejs/TBasicObject';
 import { TEngine } from './threejs/TEngine';
@@ -22,21 +23,21 @@ export default function App() {
 
         const engine = new TEngine(renderContainer);
         engine.addObjects(...BasicObjectList, ...LightsList, ...SpriteList, ...ParticleList);
-        engine.loadDatGui();
+        loadDatGui(engine);
         // const clock = new Clock();
         engine.addFunctionToAni(() => {
             // const t = clock.getElapsedTime();
             // sphere.position.set(Math.cos(t) * 30, Math.abs(Math.sin(t * 3) * 30), Math.sin(t) * 30);
         }, physicsUpdate);
-        getFlightHelmetModel().then(model => {
-            model.scene.scale.set(30, 30, 30);
-            model.scene.position.set(0, -8, 0);
+        getHamburgerModel().then(model => {
+            model.scene.scale.set(2, 2, 2);
+            model.scene.position.set(0, -2, 0);
             engine.getDatGui()
                 ?.add(model.scene.rotation, 'y')
                 .min(-Math.PI)
                 .max(Math.PI)
                 .step(0.001)
-                .name('modelRotation');
+                .name('模型旋转');
             engine.addObjects(model.scene);
             engine.updateEnvironmentMap(environmentMap, 5);
         })

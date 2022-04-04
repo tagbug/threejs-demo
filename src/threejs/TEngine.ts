@@ -4,10 +4,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as dat from 'dat.gui';
-import { BasicHelperList, CameraHelperList, LightHelperList, rectAreaLightHelperUpdate, spotLightHelperUpdate } from './THelper';
-import { BasicObjectList } from './TBasicObject';
-import { createPhysicBox, createPhysicSphere, destroyPhysicsWorld } from './TPhysics';
-import { directionLight } from './TLights';
+import { destroyPhysicsWorld } from './TPhysics';
 
 export class TEngine {
     private dom: HTMLElement;
@@ -296,124 +293,6 @@ export class TEngine {
     }
 
     /**
-     * 加载DatGui调试控制器
-     */
-    loadDatGui() {
-        const config = {
-            // 基础Helper（坐标轴、(Desperate)网格Helper）
-            basicHelper: false,
-            // 光源Helper
-            lightHelper: false,
-            // 摄像机Helpers
-            cameraHelper: false,
-            // 射线拾取+变换控制器（键盘1->移动 2->scale 3->旋转）
-            enableTransformControl: false,
-        }
-        const gui = new dat.GUI();
-        const helper = gui.addFolder('Helper');
-        helper.add(config, 'basicHelper').onChange((enable) => {
-            if (enable) {
-                this.addObjects(...BasicHelperList);
-            } else {
-                this.removeObjects(...BasicHelperList);
-            }
-        });
-        helper.add(config, 'lightHelper').onChange((enable) => {
-            if (enable) {
-                this.addObjects(...LightHelperList);
-                this.addFunctionToAni(spotLightHelperUpdate, rectAreaLightHelperUpdate);
-            } else {
-                this.removeObjects(...LightHelperList);
-                this.removeFunctionFromAni(spotLightHelperUpdate, rectAreaLightHelperUpdate);
-            }
-        });
-        helper.add(config, 'cameraHelper').onChange(enable => {
-            if (enable) {
-                this.addObjects(...CameraHelperList);
-            } else {
-                this.removeObjects(...CameraHelperList);
-            }
-        })
-        gui.add(config, 'enableTransformControl').onChange((enableTransformControl) => {
-            enableTransformControl ? this.initTransformControl() : this.destroyTransformControl();
-        });
-        gui.add({
-            createPhysicsSphere: () => {
-                createPhysicSphere(
-                    this.scene,
-                    Math.random() * 5 + 5,
-                    {
-                        x: (Math.random() - 0.5) * 100,
-                        y: 30,
-                        z: (Math.random() - 0.5) * 100,
-                    }
-                )
-            }
-        }, 'createPhysicsSphere');
-        gui.add({
-            createPhysicsBox: () => {
-                createPhysicBox(
-                    this.scene,
-                    Math.random() * 5 + 15,
-                    Math.random() * 5 + 15,
-                    Math.random() * 5 + 15,
-                    {
-                        x: (Math.random() - 0.5) * 100,
-                        y: 30,
-                        z: (Math.random() - 0.5) * 100,
-                    }
-                )
-            }
-        }, 'createPhysicsBox');
-        gui.add({
-            reset: () => {
-                destroyPhysicsWorld(this.scene);
-            }
-        }, 'reset');
-        // Realistic Render
-        const folder = gui.addFolder('Realistic Render');
-        folder.add(directionLight, 'intensity').min(0).max(10).step(0.001).name('lightIntensity');
-        folder.add(directionLight.position, 'x').min(-5).max(5).step(0.001).name('lightX');
-        folder.add(directionLight.position, 'y').min(-20).max(20).step(0.001).name('lightY');
-        folder.add(directionLight.position, 'z').min(-20).max(20).step(0.001).name('lightZ');
-        folder.add(this.renderer, 'physicallyCorrectLights');
-        folder.add({ envMapIntensity: 5 }, 'envMapIntensity').min(1).max(10).step(0.001).onChange(val => {
-            this.scene.traverse(item => {
-                if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
-                    item.material.envMapIntensity = val;
-                }
-            })
-        })
-        folder.add(this.renderer, 'toneMapping', {
-            No: three.NoToneMapping,
-            Linear: three.LinearToneMapping,
-            Reinhard: three.ReinhardToneMapping,
-            Cineon: three.CineonToneMapping,
-            ACESFilmic: three.ACESFilmicToneMapping,
-        }).onFinishChange(() => {
-            // 这是js或者datGui的一个bug，enum值会被自动转换为string，所以要手动再次转换回来
-            this.renderer.toneMapping = Number(this.renderer.toneMapping);
-            // 更新场景中的物体材质以应用toneMapping
-            this.scene.traverse(item => {
-                if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
-                    item.material.needsUpdate = true;
-                }
-            })
-        });
-        folder.add(this.renderer, 'toneMappingExposure').min(1).max(5).step(0.001);
-        folder.add({ shadow: false }, 'shadow').onChange(enable => {
-            this.scene.traverse(item => {
-                if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
-                    item.castShadow = enable;
-                    item.receiveShadow = enable;
-                }
-            })
-        })
-        this.datGui = gui;
-    }
-
-
-    /**
      * 添加方法到requestAnimateFrame的执行流程中
      * @param funs 要添加的方法
      */
@@ -451,10 +330,17 @@ export class TEngine {
     }
 
     getDatGui() {
+        if (this.datGui === null) {
+            this.datGui = new dat.GUI();
+        }
         return this.datGui;
     }
 
     getScene() {
         return this.scene;
+    }
+
+    getRenderer() {
+        return this.renderer;
     }
 }
