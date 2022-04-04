@@ -7,9 +7,10 @@ import { TEngine } from './threejs/TEngine';
 import { getTextExample } from './threejs/TFont';
 import { BasicHelperList } from './threejs/THelper';
 import { LightsList } from './threejs/TLights';
-import { getDuckModel, getFlightHelmetModel, getFoxModel, getFrame } from './threejs/TLoadModel';
+import { getDuckModel, getFlightHelmetModel, getFoxModel, getFrame, getHamburgerModel } from './threejs/TLoadModel';
 import { physicsUpdate } from './threejs/TPhysics';
 import { ParticleList, particlesAnimation, SpriteList } from './threejs/TSprite';
+import { environmentMap } from './threejs/TTextures';
 
 export default function App() {
 
@@ -22,16 +23,22 @@ export default function App() {
         const engine = new TEngine(renderContainer);
         engine.addObjects(...BasicObjectList, ...LightsList, ...SpriteList, ...ParticleList);
         engine.loadDatGui();
-        const clock = new Clock();
+        // const clock = new Clock();
         engine.addFunctionToAni(() => {
             // const t = clock.getElapsedTime();
             // sphere.position.set(Math.cos(t) * 30, Math.abs(Math.sin(t * 3) * 30), Math.sin(t) * 30);
         }, physicsUpdate);
-        getFoxModel().then(model => {
-            // model.scene.scale.set(200, 200, 200);
-            model.scene.position.set(0, -20, 0);
+        getFlightHelmetModel().then(model => {
+            model.scene.scale.set(30, 30, 30);
+            model.scene.position.set(0, -8, 0);
+            engine.getDatGui()
+                ?.add(model.scene.rotation, 'y')
+                .min(-Math.PI)
+                .max(Math.PI)
+                .step(0.001)
+                .name('modelRotation');
             engine.addObjects(model.scene);
-            engine.addFunctionToAni(playFoxAnimation(model, 2));
+            engine.updateEnvironmentMap(environmentMap);
         })
         return engine;
     }

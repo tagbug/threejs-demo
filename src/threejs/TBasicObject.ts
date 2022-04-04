@@ -71,14 +71,14 @@ const cylinder: Mesh = new Mesh(
 
 // 球体
 export const sphere: three.Mesh = new three.Mesh(
-    new three.SphereBufferGeometry(20),
+    new three.SphereBufferGeometry(5),
     new three.MeshStandardMaterial({
         roughness: 0,
-        map: pictureTexture
+        // map: pictureTexture
     })
 )
 sphere.position.y = 5;
-sphere.position.z = 20;
+// sphere.position.z = 20;
 sphere.castShadow = true;
 
 // 图片
@@ -110,4 +110,4 @@ const donutMaterial = new MeshStandardMaterial({ roughness: 0 });
     BasicObjectList.push(donut);
 } */
 
-BasicObjectList.push(stage);
+BasicObjectList.push();

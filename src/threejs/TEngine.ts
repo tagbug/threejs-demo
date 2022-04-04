@@ -1,5 +1,5 @@
 import * as three from 'three';
-import { Color, Mesh, MeshStandardMaterial, MOUSE, Object3D, Raycaster, Vector2 } from 'three';
+import { Color, CubeTexture, Mesh, MeshStandardMaterial, MOUSE, Object3D, Raycaster, Vector2 } from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
@@ -7,6 +7,7 @@ import * as dat from 'dat.gui';
 import { BasicHelperList, CameraHelperList, LightHelperList, rectAreaLightHelperUpdate, spotLightHelperUpdate } from './THelper';
 import { BasicObjectList } from './TBasicObject';
 import { createPhysicBox, createPhysicSphere, destroyPhysicsWorld } from './TPhysics';
+import { directionLight } from './TLights';
 
 export class TEngine {
     private dom: HTMLElement;
@@ -69,7 +70,7 @@ export class TEngine {
         window.addEventListener('resize', resizeListener);
 
         // 设置相机位置、视口
-        camera.position.set(300, 100, 300);
+        camera.position.set(30, 10, 30);
         camera.lookAt(new three.Vector3(0, 0, 0));
         camera.up = new three.Vector3(0, 1, 0);
 
@@ -120,7 +121,7 @@ export class TEngine {
         const camera = this.camera;
         const renderer = this.renderer;
         const scene = this.scene;
-        if (this.transformControls != null) {
+        if (this.transformControls !== null) {
             return;
         }
 
@@ -155,24 +156,28 @@ export class TEngine {
             mouse.y = -y * 2 / height + 1;
             // 选取物体
             rayCaster.setFromCamera(mouse, camera);
-            const intersection = rayCaster.intersectObjects(scene.children, false);
+            const intersection = rayCaster.intersectObjects(scene.children);
             if (intersection.length > 0) {
-                const object = intersection[0].object;
-                if (object != cachedObject) {
-                    // 派发自定义事件：鼠标离开
-                    cachedObject?.dispatchEvent({
-                        type: 'mouseLeave'
-                    })
-                    // 派发自定义事件：鼠标进入
-                    object.dispatchEvent({
-                        type: 'mouseEnter'
-                    })
-                } else {
-                    object.dispatchEvent({
-                        type: 'mouseMove'
-                    })
+                let idx = 0;
+                while (idx < intersection.length && (!(intersection[idx].object instanceof Mesh) && intersection[idx].object.type === "TransformControlsPlane")) idx++;
+                if (idx < intersection.length) {
+                    const object = intersection[idx].object;
+                    if (object !== cachedObject) {
+                        // 派发自定义事件：鼠标离开
+                        cachedObject?.dispatchEvent({
+                            type: 'mouseLeave'
+                        })
+                        // 派发自定义事件：鼠标进入
+                        object.dispatchEvent({
+                            type: 'mouseEnter'
+                        })
+                    } else {
+                        object.dispatchEvent({
+                            type: 'mouseMove'
+                        })
+                    }
+                    cachedObject = object;
                 }
-                cachedObject = object;
             } else {
                 cachedObject?.dispatchEvent({
                     type: 'mouseLeave'
@@ -187,27 +192,37 @@ export class TEngine {
             }
             rayCaster.setFromCamera(mouse, camera);
             transformControls.visible = false;
-            const intersection = rayCaster.intersectObjects(scene.children, false);
+            const intersection = rayCaster.intersectObjects(scene.children);
             if (intersection.length > 0) {
-                console.log('拾取器', intersection);
-                const object = intersection[0].object;
-                transformControls.attach(object);
-                transformControls.visible = true;
+                let idx = 0;
+                while (idx < intersection.length && (!(intersection[idx].object instanceof Mesh) || intersection[idx].object.type === "TransformControlsPlane")) idx++;
+                if (idx < intersection.length) {
+                    console.log('拾取器', intersection.slice(idx));
+                    const object = intersection[idx].object;
+                    transformControls.attach(object);
+                    transformControls.visible = true;
+                }
             }
         }
         renderer.domElement.addEventListener('mousemove', moveListener);
         renderer.domElement.addEventListener('click', clickListener);
         scene.add(transformControls);
-        // 为基础物件添加鼠标事件监听
+        // 为场景中pbr物件添加鼠标事件监听
         const mouseEnterListener = (mesh: Mesh) => {
-            (mesh.material as MeshStandardMaterial).emissive = new Color('rgb(10,10,0)');
+            if (mesh.material instanceof MeshStandardMaterial) {
+                mesh.material.emissive = new Color('rgb(10,10,0)');
+            }
         }
         const mouseLeaveListener = (mesh: Mesh) => {
-            (mesh.material as MeshStandardMaterial).emissive = new Color('black');
+            if (mesh.material instanceof MeshStandardMaterial) {
+                mesh.material.emissive = new Color('black');
+            }
         }
-        BasicObjectList.forEach(object => {
-            object.addEventListener('mouseEnter', mouseEnterListener.bind(this, object as Mesh));
-            object.addEventListener('mouseLeave', mouseLeaveListener.bind(this, object as Mesh));
+        this.scene.traverse(object => {
+            if (object instanceof Mesh && object.material instanceof MeshStandardMaterial) {
+                object.addEventListener('mouseEnter', mouseEnterListener.bind(this, object));
+                object.addEventListener('mouseLeave', mouseLeaveListener.bind(this, object));
+            }
         })
         this.mouse = mouse;
         this.transformControls = transformControls;
@@ -216,9 +231,11 @@ export class TEngine {
             document.removeEventListener('keyup', switcher);
             renderer.domElement.removeEventListener('mousemove', moveListener);
             renderer.domElement.removeEventListener('click', clickListener);
-            BasicObjectList.forEach(object => {
-                object.removeEventListener('mouseEnter', mouseEnterListener.bind(this, object as Mesh));
-                object.removeEventListener('mouseLeave', mouseLeaveListener.bind(this, object as Mesh));
+            this.scene.traverse(object => {
+                if (object instanceof Mesh && object.material instanceof MeshStandardMaterial) {
+                    object.removeEventListener('mouseEnter', mouseEnterListener.bind(this, object));
+                    object.removeEventListener('mouseLeave', mouseLeaveListener.bind(this, object));
+                }
             })
             transformControls.dispose();
         }
@@ -228,7 +245,7 @@ export class TEngine {
      * 销毁变换控制器
      */
     destroyTransformControl() {
-        if (this.transformControls != null) {
+        if (this.transformControls !== null) {
             this.scene.remove(this.transformControls);
             this.transformControlsDestroy?.call(this);
             this.transformControls = null;
@@ -345,6 +362,20 @@ export class TEngine {
                 destroyPhysicsWorld(this.scene);
             }
         }, 'reset');
+        // Realistic Render
+        const folder = gui.addFolder('Realistic Render');
+        folder.add(directionLight, 'intensity').min(0).max(10).step(0.001).name('lightIntensity');
+        folder.add(directionLight.position, 'x').min(-5).max(5).step(0.001).name('lightX');
+        folder.add(directionLight.position, 'y').min(-5).max(5).step(0.001).name('lightY');
+        folder.add(directionLight.position, 'z').min(-5).max(5).step(0.001).name('lightZ');
+        folder.add(this.renderer, 'physicallyCorrectLights');
+        folder.add({ envMapIntensity: 1 }, 'envMapIntensity').min(1).max(10).step(0.001).onChange(val => {
+            this.scene.traverse(item => {
+                if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
+                    item.material.envMapIntensity = val;
+                }
+            })
+        })
         this.datGui = gui;
     }
 
@@ -363,5 +394,29 @@ export class TEngine {
      */
     removeFunctionFromAni(...funs: Function[]) {
         this.aniFunctions = this.aniFunctions.filter(item => !funs.includes(item));
+    }
+
+    /**
+     * 向场景以及场景中的所有元素应用指定的环境贴图
+     * @param environmentMap 指定环境贴图
+     */
+    updateEnvironmentMap(environmentMap: CubeTexture) {
+        if (this.scene.environment !== environmentMap) {
+            this.scene.background = environmentMap;
+        }
+        this.scene.traverse(item => {
+            if (item instanceof Mesh && item.material instanceof MeshStandardMaterial) {
+                // 只对Mesh物体并且位MeshStandardMaterial材质应用
+                item.material.envMap = environmentMap;
+            }
+        })
+    }
+
+    getDatGui() {
+        return this.datGui;
+    }
+
+    getScene() {
+        return this.scene;
     }
 }

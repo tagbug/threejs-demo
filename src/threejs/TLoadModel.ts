@@ -44,3 +44,8 @@ export const getFoxModel = async () => {
     const loaded = await gltfLoader.loadAsync('/model/Fox/glTF/Fox.gltf');
     return loaded;
 }
+
+export const getHamburgerModel = async () => {
+    const loaded = await gltfLoader.loadAsync('/model/Hamburger/Hamburger.glb');
+    return loaded;
+}
