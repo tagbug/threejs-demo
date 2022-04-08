@@ -285,7 +285,16 @@ export class TEngine {
         this.frameUpdateRunning = false;
         this.subDomElem.forEach(elem => this.dom.removeChild(elem));
         destroyPhysicsWorld(this.scene);
-        this.scene.children.forEach(item => this.scene.remove(item));
+        this.scene.traverse(child => {
+            if (child instanceof Mesh) {
+                child.geometry.dispose();
+                for (const value of child.material) {
+                    if (value && typeof value.dispose === 'function') {
+                        value.dispose();
+                    }
+                }
+            }
+        })
         this.renderer.dispose();
         this.destroyTransformControl();
         this.datGui?.destroy();
