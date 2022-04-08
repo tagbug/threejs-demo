@@ -5,7 +5,7 @@
 
 ![example workflow](https://github.com/tagbug/threejs-demo/actions/workflows/node.js.yml/badge.svg)
 
-基于threeJS的3D装机项目
+基于TypeScript的threeJS二次封装
 
 ## 目录结构
 
